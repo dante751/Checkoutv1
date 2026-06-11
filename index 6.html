@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Plumbing Service — Checkout</title>
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ── */
+    .page {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+    }
+
+    /* ── Header ── */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 24px 16px 16px;
+      position: sticky;
+      top: 0;
+      background: #111;
+      z-index: 10;
+      border-bottom: 0.5px solid #2e2e30;
+      margin-bottom: 8px;
+    }
+    .header span { font-size: 20px; font-weight: 600; }
+    .back-btn {
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      opacity: 0.7;
+    }
+    .back-btn:hover { opacity: 1; }
+
+    /* ── Section label ── */
+    .section-label {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      padding: 0 16px;
+      margin: 20px 0 8px;
+    }
+
+    /* ── Cards / Fields ── */
+    .card {
+      background: #1c1c1e;
+      border-radius: 12px;
+      margin: 0 12px;
+      overflow: hidden;
+    }
+    .field {
+      padding: 12px 14px;
+      border-bottom: 0.5px solid #2e2e30;
+    }
+    .field:last-child { border-bottom: none; }
+    .field label {
+      font-size: 11px;
+      color: #8e8e93;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .field input,
+    .field select {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 15px;
+      width: 100%;
+      outline: none;
+      font-family: inherit;
+      -webkit-appearance: none;
+    }
+    .field select option { background: #1c1c1e; color: #fff; }
+    .field input::placeholder { color: #48484a; }
+    .field input:focus { border-bottom-color: #555; }
+
+    .field-row { display: flex; }
+    .field-row .field {
+      flex: 1;
+      border-right: 0.5px solid #2e2e30;
+      border-bottom: none;
+    }
+    .field-row .field:last-child { border-right: none; }
+
+    .select-wrap { position: relative; }
+    .select-wrap::after {
+      content: "›";
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%) rotate(90deg);
+      color: #636366;
+      pointer-events: none;
+      font-size: 18px;
+    }
+
+    /* ── Payment method row ── */
+    .pay-btn-apple {
+      background: #fff;
+      color: #000;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      padding: 14px;
+      border-radius: 12px;
+      width: calc(100% - 24px);
+      margin: 8px 12px 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .pay-btn-apple:hover { background: #e8e8e8; }
+
+    .or-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 12px;
+      margin: 10px 0;
+    }
+    .or-row span { color: #555; font-size: 13px; }
+    .or-row hr { flex: 1; border: none; border-top: 0.5px solid #333; }
+
+    .pay-row {
+      display: flex;
+      gap: 10px;
+      padding: 0 12px;
+      margin-bottom: 4px;
+    }
+    .pay-opt {
+      flex: 1;
+      background: #1c1c1e;
+      border: 1.5px solid #3a3a3c;
+      border-radius: 10px;
+      padding: 12px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      color: #fff;
+      transition: border-color 0.15s;
+      user-select: none;
+    }
+    .pay-opt.active { border-color: #fff; }
+    .pay-opt:hover { border-color: #888; }
+
+    /* ── Card icons row ── */
+    .card-icons { display: flex; gap: 4px; align-items: center; }
+
+    /* ── Summary card ── */
+    .summary-card {
+      background: #1c1c1e;
+      border-radius: 12px;
+      margin: 0 12px;
+      padding: 16px 14px;
+    }
+    .summary-title { font-size: 17px; font-weight: 600; margin-bottom: 2px; }
+    .summary-sub { font-size: 13px; color: #8e8e93; margin-top: 2px; }
+
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin: 9px 0;
+      font-size: 14px;
+      color: #ccc;
+    }
+    .feature i { color: #aaa; font-size: 17px; margin-top: 2px; flex-shrink: 0; }
+
+    .divider { border: none; border-top: 0.5px solid #2e2e30; margin: 12px 0; }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      color: #8e8e93;
+      margin: 5px 0;
+    }
+    .price-row.total {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    /* ── Book button ── */
+    .book-btn {
+      font-size: 16px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      padding: 15px;
+      border-radius: 12px;
+      width: 100%;
+      margin-top: 14px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, opacity 0.2s;
+    }
+    .book-btn.idle { background: #fff; color: #000; }
+    .book-btn.idle:hover { background: #e8e8e8; }
+    .book-btn.sending { background: #3a3a3c; color: #8e8e93; pointer-events: none; }
+    .book-btn.error { background: #3a1a1a; color: #ff453a; }
+
+    /* ── Fine print ── */
+    .fine-print {
+      font-size: 11px;
+      color: #636366;
+      padding: 16px 24px 0;
+      line-height: 1.7;
+      text-align: center;
+    }
+    .fine-print a { color: #636366; }
+
+    /* ── Config banner ── */
+
+
+    /* ══════════════════════════════
+       CONGRATULATIONS PAGE
+    ══════════════════════════════ */
+    #congrats-page {
+      display: none;
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 0 60px;
+    }
+    .congrats-inner {
+      padding: 60px 20px 40px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+    .checkmark-ring {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      border: 2.5px solid #4cd964;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 28px;
+      animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+    }
+    @keyframes pop {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+    .checkmark-ring i { font-size: 38px; color: #4cd964; }
+
+    .congrats-title {
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .congrats-sub {
+      font-size: 15px;
+      color: #8e8e93;
+      line-height: 1.6;
+      margin-bottom: 32px;
+      max-width: 320px;
+    }
+    .ref-box {
+      background: #1c1c1e;
+      border-radius: 12px;
+      padding: 16px 20px;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .ref-label {
+      font-size: 11px;
+      color: #636366;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      margin-bottom: 6px;
+    }
+    .ref-code {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: #fff;
+    }
+    .detail-card {
+      background: #1c1c1e;
+      border-radius: 12px;
+      width: 100%;
+      padding: 16px;
+      margin-bottom: 12px;
+      text-align: left;
+    }
+    .dc-label {
+      font-size: 11px;
+      color: #636366;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+    .dc-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 14px;
+      padding: 6px 0;
+      border-bottom: 0.5px solid #2e2e30;
+      gap: 12px;
+    }
+    .dc-row:last-child { border-bottom: none; }
+    .dc-row span:first-child { color: #8e8e93; white-space: nowrap; }
+    .dc-row span:last-child { color: #fff; font-weight: 500; text-align: right; word-break: break-word; }
+
+    .email-note {
+      font-size: 12px;
+      color: #636366;
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      justify-content: center;
+    }
+    .done-btn {
+      background: #fff;
+      color: #000;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      padding: 15px;
+      border-radius: 12px;
+      width: 100%;
+      margin-top: 28px;
+      cursor: pointer;
+    }
+    .done-btn:hover { background: #e8e8e8; }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════
+     CHECKOUT PAGE
+══════════════════════════════ -->
+<div class="page" id="checkout-page">
+
+  <div class="header">
+    <button class="back-btn" onclick="history.back()" aria-label="Go back">‹</button>
+    <span>Checkout</span>
+  </div>
+
+
+
+  <!-- Apple Pay -->
+  <button class="pay-btn-apple">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+    </svg>
+    Pay
+  </button>
+
+  <div class="or-row"><hr><span>OR</span><hr></div>
+
+  <!-- Card / PayPal toggle -->
+  <div class="pay-row">
+    <div class="pay-opt active" id="card-opt" onclick="selectPay('card')">
+      <i class="ti ti-credit-card"></i> Card
+    </div>
+    <div class="pay-opt" id="paypal-opt" onclick="selectPay('paypal')">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="#009cde">
+        <path d="M7.076 21.337H2.47a.641.641 0 0 1-.633-.74L4.944.901C5.026.382 5.474 0 5.998 0h7.46c2.57 0 4.578.543 5.69 1.81 1.01 1.15 1.304 2.42 1.012 4.287-.023.143-.047.288-.077.437-.983 5.05-4.349 6.797-8.647 6.797h-2.19c-.524 0-.968.382-1.05.9l-1.12 7.106zm14.146-14.42a3.35 3.35 0 0 0-.607-.541c-.013.076-.026.175-.041.254-.93 4.778-4.005 7.201-9.138 7.201h-2.19a.563.563 0 0 0-.556.479l-1.187 7.527h-.506l-.24 1.516a.56.56 0 0 0 .554.647h3.882c.46 0 .85-.334.922-.788.06-.26.76-4.852.816-5.09a.932.932 0 0 1 .923-.788h.58c3.76 0 6.705-1.528 7.565-5.946.36-1.847.174-3.388-.777-4.471z"/>
+      </svg>
+      PayPal
+    </div>
+  </div>
+
+  <!-- Contact -->
+  <p class="section-label">Contact</p>
+  <div class="card">
+    <div class="field">
+      <label>Email</label>
+      <input type="email" placeholder="your@email.com" id="f-email" autocomplete="email">
+    </div>
+  </div>
+
+  <!-- Location -->
+  <p class="section-label">Location</p>
+  <div class="card">
+    <div class="field">
+      <label>Country / Region</label>
+      <div class="select-wrap">
+        <select id="country-select" onchange="updateRegionFields()">
+          <option value="">Select country</option>
+          <option value="US">United States</option>
+          <option value="GB">United Kingdom</option>
+          <option value="CA">Canada</option>
+          <option value="AU">Australia</option>
+          <option value="KE">Kenya</option>
+          <option value="NG">Nigeria</option>
+          <option value="ZA">South Africa</option>
+          <option value="DE">Germany</option>
+          <option value="FR">France</option>
+          <option value="IN">India</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+    </div>
+    <div id="region-field" style="display:none" class="field">
+      <label id="region-label">State</label>
+      <div class="select-wrap">
+        <select id="region-select"><option value="">Select</option></select>
+      </div>
+    </div>
+    <div class="field">
+      <label>City</label>
+      <input type="text" placeholder="City" id="f-city" autocomplete="address-level2">
+    </div>
+    <div id="postcode-field" style="display:none" class="field">
+      <label id="postcode-label">Postcode</label>
+      <input type="text" id="f-postcode" placeholder="" autocomplete="postal-code">
+    </div>
+  </div>
+
+  <!-- Billing details -->
+  <p class="section-label">Billing details</p>
+  <div class="card">
+    <div class="field-row">
+      <div class="field">
+        <label>First name</label>
+        <input type="text" placeholder="First" id="f-fname" autocomplete="given-name">
+      </div>
+      <div class="field">
+        <label>Last name</label>
+        <input type="text" placeholder="Last" id="f-lname" autocomplete="family-name">
+      </div>
+    </div>
+    <div class="field">
+      <label>Address line 1</label>
+      <input type="text" placeholder="Street address" id="f-addr1" autocomplete="address-line1">
+    </div>
+    <div class="field">
+      <label>Address line 2 (optional)</label>
+      <input type="text" placeholder="Apt, suite, floor…" id="f-addr2" autocomplete="address-line2">
+    </div>
+    <div id="billing-region-field" style="display:none" class="field">
+      <label id="billing-region-label">State</label>
+      <input type="text" id="f-billing-region" placeholder="" autocomplete="address-level1">
+    </div>
+    <div class="field">
+      <label>Phone number</label>
+      <input type="tel" placeholder="+1 (000) 000-0000" id="f-phone" autocomplete="tel">
+    </div>
+  </div>
+
+  <!-- Payment -->
+  <p class="section-label">Payment</p>
+  <div class="card" id="card-fields">
+    <div class="field">
+      <label>Name on card</label>
+      <input
+        type="text"
+        placeholder="As it appears on your card"
+        id="f-cardname"
+        autocomplete="cc-name"
+        style="text-transform:uppercase;"
+        oninput="this.value=this.value.toUpperCase()"
+      >
+    </div>
+    <div class="field">
+      <label>Card number</label>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <input
+          type="text"
+          placeholder="0000 0000 0000 0000"
+          style="flex:1;"
+          maxlength="19"
+          oninput="fmtCard(this)"
+          id="f-cardnum"
+          autocomplete="cc-number"
+        >
+        <div class="card-icons">
+          <svg height="18" viewBox="0 0 48 16" fill="none">
+            <rect width="48" height="16" rx="3" fill="#1A1F71"/>
+            <text x="5" y="12" fill="#fff" font-size="8" font-weight="700">VISA</text>
+          </svg>
+          <svg height="18" viewBox="0 0 40 26" fill="none">
+            <circle cx="15" cy="13" r="12" fill="#EB001B" opacity=".9"/>
+            <circle cx="25" cy="13" r="12" fill="#F79E1B" opacity=".9"/>
+          </svg>
+          <svg height="18" viewBox="0 0 52 20" fill="none">
+            <rect width="52" height="20" rx="3" fill="#FF6600"/>
+            <text x="5" y="14" fill="#fff" font-size="8" font-weight="700">DISC</text>
+          </svg>
+        </div>
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Expiry date</label>
+        <input
+          type="text"
+          placeholder="MM / YY"
+          maxlength="7"
+          oninput="fmtExpiry(this)"
+          id="f-expiry"
+          autocomplete="cc-exp"
+        >
+      </div>
+      <div class="field">
+        <label>Security code</label>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <input type="text" placeholder="CVV" maxlength="4" id="f-cvv" autocomplete="cc-csc">
+          <i class="ti ti-credit-card" style="color:#636366;font-size:19px;"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order summary + book button -->
+  <div style="margin:24px 12px 0;">
+    <div class="summary-card">
+      <!-- EDIT: Update service name, description, and pricing below -->
+      <div class="summary-title">Emergency plumbing — full service</div>
+      <p class="summary-sub">Same-day call-out · Parts included</p>
+      <div class="divider"></div>
+      <div class="feature"><i class="ti ti-tool"></i><span>Leak detection &amp; repair</span></div>
+      <div class="feature"><i class="ti ti-droplet"></i><span>Pipe fitting &amp; replacement</span></div>
+      <div class="feature"><i class="ti ti-certificate"></i><span>Certified plumber assigned</span></div>
+      <div class="feature"><i class="ti ti-clock"></i><span>2-hour arrival guarantee</span></div>
+      <div class="divider"></div>
+      <div class="price-row"><span>Service fee</span><span>$120.00</span></div>
+      <div class="price-row"><span>Call-out charge</span><span>$25.00</span></div>
+      <div class="price-row"><span>Estimated tax</span><span>$0.00</span></div>
+      <div class="price-row total"><span>Due today</span><span>$145.00</span></div>
+      <button class="book-btn idle" id="book-btn" onclick="handleBook()">Book &amp; pay</button>
+    </div>
+  </div>
+
+  <p class="fine-print">
+    You agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+    Charges are processed securely. Cancellations made more than 2 hours before the scheduled
+    call-out are fully refunded.
+  </p>
+
+</div><!-- /checkout-page -->
+
+
+
+
+
+<script>
+  /* ════════════════════════════
+     GOOGLE SHEETS — PASTE YOUR WEB APP URL BELOW
+     1. Deploy google-apps-script.gs as a Web App (see README)
+     2. Replace the empty string with your Web App URL
+     Example:
+     const SHEET_URL = "https://script.google.com/macros/s/AKfycb.../exec";
+  ════════════════════════════ */
+  // ▼▼▼ PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL BETWEEN THE QUOTES BELOW ▼▼▼
+  const SHEET_URL = "";
+
+  /* ════════════════════════════
+     HELPERS
+  ════════════════════════════ */
+  function g(id) { return (document.getElementById(id) || {}).value || ''; }
+
+  function setBtn(state, label) {
+    const b = document.getElementById('book-btn');
+    b.className = 'book-btn ' + state;
+    b.textContent = label;
+  }
+
+  function selectPay(type) {
+    document.getElementById('card-opt').classList.toggle('active', type === 'card');
+    document.getElementById('paypal-opt').classList.toggle('active', type === 'paypal');
+    document.getElementById('card-fields').style.display = type === 'card' ? 'block' : 'none';
+  }
+
+  function fmtCard(el) {
+    let v = el.value.replace(/\D/g, '').substring(0, 16);
+    el.value = v.replace(/(.{4})/g, '$1 ').trim();
+  }
+
+  function fmtExpiry(el) {
+    let v = el.value.replace(/\D/g, '').substring(0, 4);
+    if (v.length >= 3) v = v.substring(0, 2) + ' / ' + v.substring(2);
+    el.value = v;
+  }
+
+  /* ════════════════════════════
+     REGION / COUNTRY LOGIC
+  ════════════════════════════ */
+  const regionData = {
+    US: { label:"State", postcode:"ZIP code", regions:["Alabama","Alaska","Arizona","Arkansas","California","Colorado","Connecticut","Delaware","Florida","Georgia","Hawaii","Idaho","Illinois","Indiana","Iowa","Kansas","Kentucky","Louisiana","Maine","Maryland","Massachusetts","Michigan","Minnesota","Mississippi","Missouri","Montana","Nebraska","Nevada","New Hampshire","New Jersey","New Mexico","New York","North Carolina","North Dakota","Ohio","Oklahoma","Oregon","Pennsylvania","Rhode Island","South Carolina","South Dakota","Tennessee","Texas","Utah","Vermont","Virginia","Washington","West Virginia","Wisconsin","Wyoming"] },
+    CA: { label:"Province", postcode:"Postal code", regions:["Alberta","British Columbia","Manitoba","New Brunswick","Newfoundland and Labrador","Nova Scotia","Ontario","Prince Edward Island","Quebec","Saskatchewan"] },
+    AU: { label:"State", postcode:"Postcode", regions:["Australian Capital Territory","New South Wales","Northern Territory","Queensland","South Australia","Tasmania","Victoria","Western Australia"] },
+    IN: { label:"State", postcode:"PIN code", regions:["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"] },
+    GB: { label:"County",   postcode:"Postcode",     regions:[] },
+    DE: { label:"State",    postcode:"Postcode",     regions:[] },
+    FR: { label:"Region",   postcode:"Postcode",     regions:[] },
+    KE: { label:"County",   postcode:null, regions:["Nairobi","Mombasa","Kisumu","Nakuru","Eldoret","Thika","Malindi","Kitale","Garissa","Kakamega","Nyeri","Meru"] },
+    NG: { label:"State",    postcode:null, regions:["Abia","Adamawa","Akwa Ibom","Anambra","Bauchi","Bayelsa","Benue","Borno","Cross River","Delta","Ebonyi","Edo","Ekiti","Enugu","FCT","Gombe","Imo","Jigawa","Kaduna","Kano","Katsina","Kebbi","Kogi","Kwara","Lagos","Nasarawa","Niger","Ogun","Ondo","Osun","Oyo","Plateau","Rivers","Sokoto","Taraba","Yobe","Zamfara"] },
+    ZA: { label:"Province", postcode:"Postal code", regions:["Eastern Cape","Free State","Gauteng","KwaZulu-Natal","Limpopo","Mpumalanga","Northern Cape","North West","Western Cape"] },
+  };
+
+  function updateRegionFields() {
+    const val  = document.getElementById('country-select').value;
+    const info = regionData[val];
+    const rf   = document.getElementById('region-field');
+    const pf   = document.getElementById('postcode-field');
+    const brf  = document.getElementById('billing-region-field');
+    const rs   = document.getElementById('region-select');
+    const ph   = document.getElementById('f-phone');
+
+    const prefixes = { US:'+1 ', CA:'+1 ', GB:'+44 ', AU:'+61 ', KE:'+254 ', NG:'+234 ', ZA:'+27 ', DE:'+49 ', FR:'+33 ', IN:'+91 ' };
+    if (prefixes[val]) ph.placeholder = prefixes[val] + '000 000 0000';
+
+    if (!info) { rf.style.display='none'; pf.style.display='none'; brf.style.display='none'; return; }
+
+    document.getElementById('region-label').textContent         = info.label;
+    document.getElementById('billing-region-label').textContent = info.label;
+    document.getElementById('f-billing-region').placeholder     = info.label;
+
+    if (info.regions && info.regions.length) {
+      rs.innerHTML = '<option value="">Select ' + info.label + '</option>' +
+        info.regions.map(r => '<option value="' + r + '">' + r + '</option>').join('');
+      rf.style.display = 'block';
+    } else if (info.label) {
+      rs.innerHTML = '<option value="">Enter ' + info.label + '</option>';
+      rf.style.display = 'block';
+    } else {
+      rf.style.display = 'none';
+    }
+
+    brf.style.display = 'block';
+
+    if (info.postcode) {
+      document.getElementById('postcode-label').textContent = info.postcode;
+      document.getElementById('f-postcode').placeholder     = info.postcode;
+      pf.style.display = 'block';
+    } else {
+      pf.style.display = 'none';
+    }
+  }
+
+  /* ════════════════════════════
+     BOOK & PAY
+     Posts to Google Sheet, then
+     redirects to thankyou.html
+     with booking data in URL params
+  ════════════════════════════ */
+  async function handleBook() {
+    const country     = document.getElementById('country-select');
+    const countryName = country.options[country.selectedIndex]?.text || '';
+    const regionVal   = document.getElementById('region-select')?.value || '';
+    const cardRaw     = g('f-cardnum');
+    const maskedCard  = cardRaw.length >= 4
+      ? '**** **** **** ' + cardRaw.replace(/\s/g, '').slice(-4)
+      : '';
+
+    const now        = new Date();
+    const bookingRef = 'BK-' +
+      now.getFullYear() +
+      ('0' + (now.getMonth() + 1)).slice(-2) +
+      ('0' + now.getDate()).slice(-2) + '-' +
+      Math.floor(Math.random() * 9000 + 1000);
+
+    const payload = {
+      booking_ref:    bookingRef,
+      booking_date:   now.toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }) + ' ' +
+                      now.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' }),
+      customer_name:  ([g('f-fname'), g('f-lname')].filter(Boolean).join(' ')) || '',
+      customer_email: g('f-email'),
+      customer_phone: g('f-phone'),
+      country:        countryName,
+      region_value:   regionVal,
+      city:           g('f-city'),
+      postcode_value: g('f-postcode'),
+      address_1:      g('f-addr1'),
+      address_2:      g('f-addr2'),
+      card_name:      g('f-cardname'),
+      card_masked:    maskedCard,
+      card_expiry:    g('f-expiry'),
+      payment_method: document.getElementById('card-opt').classList.contains('active') ? 'Card' : 'PayPal',
+      service_name:   'Emergency plumbing — full service',
+      service_fee:    '$120.00',
+      callout_charge: '$25.00',
+      tax:            '$0.00',
+      total:          '$145.00',
+    };
+
+    setBtn('sending', 'Processing…');
+
+    // POST to Google Sheet — fires and moves on regardless of outcome
+    let sheetStatus = 'skip';
+    if (SHEET_URL && SHEET_URL.startsWith('https://script.google.com')) {
+      try {
+        await fetch(SHEET_URL, {
+          method:  'POST',
+          mode:    'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(payload),
+        });
+        sheetStatus = 'ok';
+      } catch (err) {
+        console.error('Sheet POST error:', err);
+        sheetStatus = 'fail';
+      }
+    }
+
+    // Always redirect — nothing blocks this
+    const p = new URLSearchParams({
+      ref:      bookingRef,
+      name:     payload.customer_name,
+      phone:    payload.customer_phone,
+      city:     payload.city,
+      address:  payload.address_1 + (payload.address_2 ? ', ' + payload.address_2 : ''),
+      cardname: payload.card_name,
+      card:     maskedCard,
+      expiry:   payload.card_expiry,
+      sheet:    sheetStatus,
+    });
+
+    window.location.href = 'thankyou.html?' + p.toString();
+  }
+
+  /* ════════════════════════════
+     INIT
+  ════════════════════════════ */
+</script>
+
+</body>
+</html>
